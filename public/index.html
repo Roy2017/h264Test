@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>h264-live-player web client demo</title>
+    <style>
+        canvas{
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+<br />
+<!-- provide WSAvcPlayer -->
+<script type="text/javascript" src="http-live-player.js">;</script>
+<script type="text/javascript">
+
+  var canvas = document.createElement('canvas');
+  document.body.appendChild(canvas);
+
+  // 调试
+  var uri = "ws://" + '192.168.2.114:7777/websockets/android/e2b154b9-8217-4554-920e-7192b6014916/c77d4ce7/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOlsia2FpZmExIiwiMzA4NTViYjAtYzBkNC00MzMyLTg3ZTItNWYwMjQ0ZjJmYTZlIl0sImV4cCI6MTY0MTM5MzcyN30.V2R0viSwvmA0LV626oeCWqV6vOt8MX4SQe39SxfSBgg';
+  // h264文件
+  // uri = 'ws://localhost:8080/'
+  //
+  var wsavc = new WSAvcPlayer(canvas, 'webgl', 1, 35);
+  wsavc.connect(uri);
+  window.wsavc = wsavc;
+  setTimeout(() => {
+    wsavc.playStream(uri)
+  }, 300)
+</script>
+</body>
+</html>
