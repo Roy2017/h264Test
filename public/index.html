@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>h264-live-player web client demo</title>
+    <title>h264-player web client demo</title>
     <style>
         canvas{
             background-color: #000;
@@ -9,24 +9,47 @@
 </head>
 <body>
 <br />
-<!-- provide WSAvcPlayer -->
-<script type="text/javascript" src="http-live-player.js">;</script>
+<video id="player" controls autoplay style="max-height: 100vh;" ></video>
+<script type="text/javascript" src="jmuxer.js">;</script>
+<script type="text/javascript" >
+  var cmdFN = function (cmd) {
+    if (cmd.action == 'init') {
+      var message = 'REQUESTSTREAM ';
+      window.__ws.send(message);
+    } else if (cmd.msg == 'size') {
+      console.log('初始化成功: size: ' + cmd.width + ',' + cmd.height);
+      window.isInit = true;
+    } else if (cmd.size == 'msg') {
+      console.log('初始化成功: size: ' + cmd.width + ',' + cmd.height);
+      window.isInit = true;
+    }
+  }
+</script>
 <script type="text/javascript">
-
-  var canvas = document.createElement('canvas');
-  document.body.appendChild(canvas);
-
-  // 调试
-  var uri = "ws://" + '192.168.2.114:7777/websockets/android/e2b154b9-8217-4554-920e-7192b6014916/c77d4ce7/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOlsia2FpZmExIiwiMzA4NTViYjAtYzBkNC00MzMyLTg3ZTItNWYwMjQ0ZjJmYTZlIl0sImV4cCI6MTY0MTM5MzcyN30.V2R0viSwvmA0LV626oeCWqV6vOt8MX4SQe39SxfSBgg';
-  // h264文件
-  // uri = 'ws://localhost:8080/'
-  //
-  var wsavc = new WSAvcPlayer(canvas, 'webgl', 1, 35);
-  wsavc.connect(uri);
-  window.wsavc = wsavc;
-  setTimeout(() => {
-    wsavc.playStream(uri)
-  }, 300)
+  var socketURL = "ws://" + '172.21.224.1' + ':7777/websockets/android/e2b154b9-8217-4554-920e-7192b6014916/c77d4ce7/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOlsia2FpZmExIiwiNTE4YTVlM2ItZWM0YS00MDBhLWJkMzUtYzQzOGQ2ZDExMmJhIl0sImV4cCI6MTY0MzczNjQzN30.EFNyHYBtFfhD73qtq39_dOOIaLmnVofw1ZwE4w-aPYI';
+  // socketURL = 'ws://localhost:8010';
+  var jmuxer = new JMuxer({
+    node: 'player',
+    mode: 'video',
+    flushingTime: 77,
+    fps: 60,
+    debug: false
+  });
+  var ws = window.__ws = new WebSocket(socketURL);
+  ws.binaryType = 'arraybuffer';
+  ws.addEventListener('message',function(event) {
+    if (typeof event.data == 'string') {
+      return cmdFN(JSON.parse(event.data));
+    }
+    else if (1) {
+      jmuxer.feed({
+        video : new Uint8Array(event.data),
+      });
+    }
+  });
+  ws.addEventListener('error', function(e) {
+    console.log('Socket Error');
+  });
 </script>
 </body>
 </html>

@@ -26,10 +26,10 @@ const source = {
 const feed = new RemoteTCPFeedRelay(server, source);
 
 
-server.listen(8080);
+server.listen(8010);
 
 const opn = require('opn')
-opn('http://localhost:8080/')
+opn('http://localhost:8010/')
 
 
 
